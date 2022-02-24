@@ -5,10 +5,7 @@ def pytest_configure():
     settings.configure(
         CACHES={"default": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"}},
         DATABASES={
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": "db.sqlite",
-            }
+            "default": {"ENGINE": "django.db.backends.sqlite3", "NAME": "db.sqlite",}
         },
         INSTALLED_APPS=[
             "wagtail.embeds",
@@ -20,6 +17,7 @@ def pytest_configure():
             "wagtail.search",
             "wagtail.admin",
             "wagtail.core",
+            "wagtail.contrib.routable_page",
             "modelcluster",
             "taggit",
             "django.contrib.auth",
@@ -28,7 +26,7 @@ def pytest_configure():
             "django.contrib.messages",
             "django.contrib.sitemaps",
             "django.contrib.staticfiles",
-            "wagtail_social_publishing",
+            "wagtail_secret_sharing",
         ],
         MIDDLEWARE_CLASSES=[
             "django.middleware.security.SecurityMiddleware",
@@ -40,4 +38,5 @@ def pytest_configure():
             "django.middleware.clickjacking.XFrameOptionsMiddleware",
             "wagtail.core.middleware.SiteMiddleware",
         ],
+        SECRET_KEY="tests",
     )

@@ -1,15 +1,20 @@
 # Wagtail Secret Sharing
 
-This add-on uses the [django-secret-sharing](https://github.com/vicktornl/django-secret-sharing) app.
+[![Version](https://img.shields.io/pypi/v/wagtail-secret-sharing.svg?style=flat)](https://pypi.python.org/pypi/wagtail-secret-sharing/)
+![CI](https://github.com/vicktornl/wagtail-secret-sharing/actions/workflows/ci.yml/badge.svg)
+
+A secure sharing app for Wagtail using [wagtail-secret-sharing](https://github.com/vicktornl/wagtail-secret-sharing).
 
 ## Features
 
-- ...
+* Keep sensitive information out of your chat logs and email via a secure sharing protocal
+* REST API
+* One time secrets
 
 ## Requirements
 
 - Python 3
-- Django >= 2
+- Django >= 2.2.8
 - Wagtail >= 2
 
 ## Installation
@@ -22,11 +27,13 @@ pip install wagtail-secret-sharing
 
 Add `wagtail.contrib.routable_page` and `wagtail_secret_sharing` to your INSTALLED_APPS
 
+```
 INSTALLED_APPS = [
     ...
     "wagtail.contrib.routable_page",
     "wagtail_secret_sharing",
 ]
+```
 
 
 Extend the `AbstractSecretsPage`
@@ -44,14 +51,10 @@ Run migrate
 python manage.py migrate
 ```
 
-## Customization
+## Templates
 
 Override the default templates with your own
 
-```
-{% extends "django_secret_sharing/secrets.html" %}
-
-...
-```
-
-Note: for the landing page `_landing` is added to the `template_name`, if you want to change this override the `get_landing_page_template` method.
+**django_secret_sharing/create.html**
+**django_secret_sharing/retrieve.html**
+**django_secret_sharing/view.html**
