@@ -3,11 +3,11 @@
 [![Version](https://img.shields.io/pypi/v/wagtail-secret-sharing.svg?style=flat)](https://pypi.python.org/pypi/wagtail-secret-sharing/)
 ![CI](https://github.com/vicktornl/wagtail-secret-sharing/actions/workflows/ci.yml/badge.svg)
 
-A secure sharing app for Wagtail using [wagtail-secret-sharing](https://github.com/vicktornl/wagtail-secret-sharing).
+A secure sharing app for Wagtail using [django-secret-sharing](https://github.com/vicktornl/django-secret-sharing).
 
 ## Features
 
-* Keep sensitive information out of your chat logs and email via a secure sharing protocal
+* Keep sensitive information out of your chat logs and email via a secure sharing protocol
 * REST API
 * One time secrets
 
