@@ -29,6 +29,7 @@ def pytest_configure():
             "django.contrib.messages",
             "django.contrib.sitemaps",
             "django.contrib.staticfiles",
+            "django_secret_sharing",
             "wagtail_secret_sharing",
         ],
         MIDDLEWARE_CLASSES=[
