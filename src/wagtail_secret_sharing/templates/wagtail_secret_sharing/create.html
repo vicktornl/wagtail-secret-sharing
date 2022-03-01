@@ -1,0 +1,12 @@
+{% load wagtailroutablepage_tags %}
+
+{% if secret_url %}
+    <p>{{ secret_url }}</p>
+    <a href="{% routablepageurl page 'create' %}">Create</a>
+{% else %}
+  <form action="{% routablepageurl page 'create' %}" method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Submit">
+  </form>
+{% endif %}

@@ -25,12 +25,13 @@ Install the package
 pip install wagtail-secret-sharing
 ```
 
-Add `wagtail.contrib.routable_page` and `wagtail_secret_sharing` to your INSTALLED_APPS
+Add `wagtail.contrib.routable_page`, `django_secret_sharing` and `wagtail_secret_sharing` to your INSTALLED_APPS
 
 ```
 INSTALLED_APPS = [
     ...
     "wagtail.contrib.routable_page",
+    "django_secret_sharing,
     "wagtail_secret_sharing",
 ]
 ```
@@ -42,7 +43,7 @@ Extend the `AbstractSecretsPage`
 from wagtail_secret_sharing.models import AbstractSecretsPage
 
 class SecretsPage(AbstractSecretsPage):
-    template_name = "secrets.html"
+    ...
 ```
 
 Run migrate
@@ -55,6 +56,36 @@ python manage.py migrate
 
 Override the default templates with your own
 
-**django_secret_sharing/create.html**
-**django_secret_sharing/retrieve.html**
-**django_secret_sharing/view.html**
+**wagtail_secret_sharing/create.html**
+
+```
+{% load wagtailroutablepage_tags %}
+
+{% if secret_url %}
+    <p>{{ secret_url }}</p>
+    <a href="{% routablepageurl page 'create' %}">Create</a>
+{% else %}
+  <form action="{% routablepageurl page 'create' %}" method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="Submit">
+  </form>
+{% endif %}
+```
+
+**wagtail_secret_sharing/retrieve.html**
+
+```
+{% load wagtailroutablepage_tags %}
+
+<a href="{% routablepageurl page 'view' url_part %}">View</a>
+```
+
+**wagtail_secret_sharing/view.html**
+
+```
+{% load wagtailroutablepage_tags %}
+
+<textarea disabled>{{ value }}</textarea>
+<a href="{% routablepageurl page 'create' %}">Create</a>
+```
