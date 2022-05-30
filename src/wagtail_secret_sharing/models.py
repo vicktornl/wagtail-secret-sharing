@@ -1,5 +1,7 @@
 from django.http import Http404
 from django.template.response import TemplateResponse
+from django.utils.crypto import get_random_string
+from django_secret_sharing import settings
 from django_secret_sharing.exceptions import SecretNotFound
 from django_secret_sharing.forms import CreateSecretForm
 from django_secret_sharing.utils import create_secret, get_secret_by_url_part
@@ -15,6 +17,33 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
     class Meta:
         abstract = True
 
+    @route(r"^generate-password/$", name="generate-password")
+    def generate_password(self, request):
+        context = super().get_context(request)
+
+        if request.method == "POST":
+            form = CreateSecretForm(request.POST)
+            if form.is_valid():
+                secret, url_part = create_secret(
+                    value=form.cleaned_data.get("value"),
+                    expires_in=form.cleaned_data.get("expires"),
+                    view_once=form.cleaned_data.get("view_once"),
+                )
+
+                context["secret_url"] = self.full_url + self.reverse_subpage(
+                    "retrieve", args=(url_part,)
+                )
+        else:
+            form = CreateSecretForm()
+            form.initial["value"] = get_random_string(settings.PASSWORD_LENGTH)
+        context["form"] = form
+
+        return TemplateResponse(
+            request,
+            self.get_create_page_template(),
+            context,
+        )
+
     @route(r"^$", name="create")
     def create(self, request):
         context = super().get_context(request)
@@ -22,7 +51,11 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
         if request.method == "POST":
             form = CreateSecretForm(request.POST)
             if form.is_valid():
-                secret, url_part = create_secret(form.cleaned_data.get("value"))
+                secret, url_part = create_secret(
+                    value=form.cleaned_data.get("value"),
+                    expires_in=form.cleaned_data.get("expires"),
+                    view_once=form.cleaned_data.get("view_once"),
+                )
 
                 context["secret_url"] = self.full_url + self.reverse_subpage(
                     "retrieve", args=(url_part,)
@@ -61,7 +94,8 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
         except SecretNotFound:
             raise Http404()
 
-        secret.erase()
+        if secret.view_once:
+            secret.erase()
 
         context = super().get_context(request)
         context["value"] = value
