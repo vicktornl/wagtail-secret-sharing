@@ -30,6 +30,7 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
                     view_once=form.cleaned_data.get("view_once"),
                 )
 
+                context["secret"] = secret
                 context["secret_url"] = request.build_absolute_uri(
                     self.reverse_subpage("retrieve", args=(url_part,))
                 )
@@ -61,6 +62,7 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
             raise Http404()
 
         context = super().get_context(request)
+        context["secret"] = secret
         context["url_part"] = url_part
 
         return TemplateResponse(
@@ -80,6 +82,7 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
             secret.erase()
 
         context = super().get_context(request)
+        context["secret"] = secret
         context["value"] = value
 
         return TemplateResponse(
