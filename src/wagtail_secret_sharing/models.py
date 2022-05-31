@@ -17,33 +17,6 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
     class Meta:
         abstract = True
 
-    @route(r"^generate-password/$", name="generate-password")
-    def generate_password(self, request):
-        context = super().get_context(request)
-
-        if request.method == "POST":
-            form = CreateSecretForm(request.POST)
-            if form.is_valid():
-                secret, url_part = create_secret(
-                    value=form.cleaned_data.get("value"),
-                    expires_in=form.cleaned_data.get("expires"),
-                    view_once=form.cleaned_data.get("view_once"),
-                )
-
-                context["secret_url"] = self.full_url + self.reverse_subpage(
-                    "retrieve", args=(url_part,)
-                )
-        else:
-            form = CreateSecretForm()
-            form.initial["value"] = get_random_string(settings.PASSWORD_LENGTH)
-        context["form"] = form
-
-        return TemplateResponse(
-            request,
-            self.get_create_page_template(),
-            context,
-        )
-
     @route(r"^$", name="create")
     def create(self, request):
         context = super().get_context(request)
@@ -57,8 +30,8 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
                     view_once=form.cleaned_data.get("view_once"),
                 )
 
-                context["secret_url"] = self.full_url + self.reverse_subpage(
-                    "retrieve", args=(url_part,)
+                context["secret_url"] = request.build_absolute_uri(
+                    self.reverse_subpage("retrieve", args=(url_part,))
                 )
         else:
             form = CreateSecretForm()
@@ -70,6 +43,15 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
             self.get_create_page_template(),
             context,
         )
+
+    @route(r"^generate-password/$", name="generate-password")
+    def generate_password(self, request):
+        res = self.create(request)
+        if request.method == "GET":
+            res.context_data["form"].initial["value"] = get_random_string(
+                settings.PASSWORD_LENGTH
+            )
+        return res
 
     @route(r"^(\w+)/$", name="retrieve")
     def retrieve(self, request, url_part):
