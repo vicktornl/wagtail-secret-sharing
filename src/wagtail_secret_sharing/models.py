@@ -1,5 +1,7 @@
 from django.http import Http404
 from django.template.response import TemplateResponse
+from django.utils.crypto import get_random_string
+from django_secret_sharing import settings
 from django_secret_sharing.exceptions import SecretNotFound
 from django_secret_sharing.forms import CreateSecretForm
 from django_secret_sharing.utils import create_secret, get_secret_by_url_part
@@ -22,10 +24,15 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
         if request.method == "POST":
             form = CreateSecretForm(request.POST)
             if form.is_valid():
-                secret, url_part = create_secret(form.cleaned_data.get("value"))
+                secret, url_part = create_secret(
+                    value=form.cleaned_data.get("value"),
+                    expires_in=form.cleaned_data.get("expires"),
+                    view_once=form.cleaned_data.get("view_once"),
+                )
 
-                context["secret_url"] = self.full_url + self.reverse_subpage(
-                    "retrieve", args=(url_part,)
+                context["secret"] = secret
+                context["secret_url"] = request.build_absolute_uri(
+                    self.reverse_subpage("retrieve", args=(url_part,))
                 )
         else:
             form = CreateSecretForm()
@@ -38,6 +45,15 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
             context,
         )
 
+    @route(r"^generate-password/$", name="generate-password")
+    def generate_password(self, request):
+        res = self.create(request)
+        if request.method == "GET":
+            res.context_data["form"].initial["value"] = get_random_string(
+                settings.PASSWORD_LENGTH
+            )
+        return res
+
     @route(r"^(\w+)/$", name="retrieve")
     def retrieve(self, request, url_part):
         try:
@@ -46,6 +62,7 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
             raise Http404()
 
         context = super().get_context(request)
+        context["secret"] = secret
         context["url_part"] = url_part
 
         return TemplateResponse(
@@ -61,9 +78,11 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
         except SecretNotFound:
             raise Http404()
 
-        secret.erase()
+        if secret.view_once:
+            secret.erase()
 
         context = super().get_context(request)
+        context["secret"] = secret
         context["value"] = value
 
         return TemplateResponse(
