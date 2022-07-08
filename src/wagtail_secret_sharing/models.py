@@ -1,5 +1,7 @@
 from django.http import Http404
 from django.template.response import TemplateResponse
+from django.utils.crypto import get_random_string
+from django_secret_sharing import settings as django_secret_sharing_settings
 from django_secret_sharing.exceptions import SecretNotFound
 from django_secret_sharing.forms import CreateSecretForm
 from django_secret_sharing.utils import create_secret, get_secret_by_url_part
@@ -22,8 +24,13 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
         if request.method == "POST":
             form = CreateSecretForm(request.POST)
             if form.is_valid():
-                secret, url_part = create_secret(form.cleaned_data.get("value"))
+                secret, url_part = create_secret(
+                    value=form.cleaned_data.get("value"),
+                    expires_in=form.cleaned_data.get("expires"),
+                    view_once=form.cleaned_data.get("view_once"),
+                )
 
+                context["secret"] = secret
                 context["secret_url"] = self.full_url + self.reverse_subpage(
                     "retrieve", args=(url_part,)
                 )
@@ -46,6 +53,7 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
             raise Http404()
 
         context = super().get_context(request)
+        context["secret"] = secret
         context["url_part"] = url_part
 
         return TemplateResponse(
@@ -65,10 +73,30 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
 
         context = super().get_context(request)
         context["value"] = value
+        context["secret"] = secret
 
         return TemplateResponse(
             request,
             self.get_view_page_template(),
+            context,
+        )
+
+    @route(r"^generate-password/$", name="generate-password")
+    def generate_password(self, request):
+        form = CreateSecretForm(
+            initial={
+                "value": get_random_string(
+                    django_secret_sharing_settings.PASSWORD_LENGTH
+                )
+            }
+        )
+
+        context = super().get_context(request)
+        context["form"] = form
+
+        return TemplateResponse(
+            request,
+            self.get_create_page_template(),
             context,
         )
 
