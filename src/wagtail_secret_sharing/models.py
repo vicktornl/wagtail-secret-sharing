@@ -69,7 +69,8 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
         except SecretNotFound:
             raise Http404()
 
-        secret.erase()
+        if secret.view_once:
+            secret.erase()
 
         context = super().get_context(request)
         context["value"] = value
