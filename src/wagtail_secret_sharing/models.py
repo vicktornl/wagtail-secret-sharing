@@ -28,6 +28,7 @@ class AbstractSecretsPage(RoutablePageMixin, Page):
                     value=form.cleaned_data.get("value"),
                     expires_in=form.cleaned_data.get("expires"),
                     view_once=form.cleaned_data.get("view_once"),
+                    file_refs=form.cleaned_data["file_refs"],
                 )
 
                 context["secret"] = secret

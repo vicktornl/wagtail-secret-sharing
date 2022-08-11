@@ -12,6 +12,7 @@ A secure sharing app for Wagtail using [django-secret-sharing](https://github.co
 * One time secrets
 * Expiry dates
 * Create random passwords
+* Secure S3 presigned file transfers
 
 ## Requirements
 
@@ -48,6 +49,15 @@ class SecretsPage(AbstractSecretsPage):
     ...
 ```
 
+Add the urls (`api_urls` not needed when you don't use file transfers or any other API features)
+
+```
+urlpatterns = [
+  ...
+  path("api/secrets/", include("django_secret_sharing.api_urls"),),
+]
+```
+
 Run migrate
 
 ```
@@ -67,12 +77,19 @@ Override the default templates with your own
     <p>{{ secret_url }}</p>
     <a href="{% routablepageurl page 'create' %}">Create</a>
 {% else %}
-  <form action="{% routablepageurl page 'create' %}" method="post">
+  <form id="secret_form" action="{% routablepageurl page 'create' %}" method="post">
       {% csrf_token %}
       {{ form }}
+      <div id="files"></div>
+      <button type="button" id="add_file">Add file</button>
       <input type="submit" value="Submit">
   </form>
 {% endif %}
+
+{% block scripts %}
+{% include "django_secret_sharing/file_transfer_simple.html" %}
+{% include "django_secret_sharing/file_transfer_scripts.html" %}
+{% endblock %}
 ```
 
 **wagtail_secret_sharing/retrieve.html**
@@ -91,3 +108,7 @@ Override the default templates with your own
 <textarea disabled>{{ value }}</textarea>
 <a href="{% routablepageurl page 'create' %}">Create</a>
 ```
+
+## File transfers
+
+For more information how to use file transfers we suggest you to read the (https://github.com/vicktornl/django-secret-sharing#file-transfers)[documentation] of `django-secret-sharing`.

@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-install_requires = ["django-secret-sharing>=0.3.0", "wagtail>=2"]
+install_requires = ["django-secret-sharing>=0.4.0", "wagtail>=2"]
 
 tests_requires = [
     "black",
@@ -14,7 +14,7 @@ tests_requires = [
 
 setup(
     name="wagtail-secret-sharing",
-    version="0.2.1",
+    version="0.3.0",
     description="",
     author="R. Moorman <rob@vicktor.nl>",
     install_requires=install_requires,
