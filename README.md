@@ -12,6 +12,7 @@ A secure sharing app for Wagtail using [django-secret-sharing](https://github.co
 * One time secrets
 * Expiry dates
 * Create random passwords
+* Secure S3 presigned file transfers
 
 ## Requirements
 
@@ -91,3 +92,7 @@ Override the default templates with your own
 <textarea disabled>{{ value }}</textarea>
 <a href="{% routablepageurl page 'create' %}">Create</a>
 ```
+
+## File transfers
+
+For more information how to use file transfers we suggest you to read the (https://github.com/vicktornl/django-secret-sharing#file-transfers)[documentation] of `django-secret-sharing`.
