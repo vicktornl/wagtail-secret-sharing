@@ -1,4 +1,13 @@
 {% load wagtailroutablepage_tags %}
 
 <textarea disabled>{{ value }}</textarea>
+{% if secret.files.all %}
+<ul>
+    {% for file in secret.files.all %}
+    <li>
+        <a href="{{ file.download_url }}" target="_blank" ref="noopener noreferrer">{{ file.filename }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
 <a href="{% routablepageurl page 'create' %}">Create</a>

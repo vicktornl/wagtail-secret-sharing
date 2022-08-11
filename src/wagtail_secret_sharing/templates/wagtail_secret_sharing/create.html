@@ -4,10 +4,17 @@
     <p>{{ secret_url }}</p>
     <a href="{% routablepageurl page 'create' %}">Create</a>
 {% else %}
-  <form action="{% routablepageurl page 'create' %}" method="post">
+  <form id="secret_form" action="{% routablepageurl page 'create' %}" method="post">
       {% csrf_token %}
       {{ form }}
+      <div id="files"></div>
+      <button type="button" id="add_file">Add file</button>
       <input type="submit" value="Submit">
       <a href="{% routablepageurl page 'generate-password' %}">Generate password</a>
   </form>
 {% endif %}
+
+{% block scripts %}
+{% include "django_secret_sharing/file_transfer_simple.html" %}
+{% include "django_secret_sharing/file_transfer_scripts.html" %}
+{% endblock %}
