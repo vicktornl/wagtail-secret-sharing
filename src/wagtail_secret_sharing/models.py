@@ -6,7 +6,7 @@ from django_secret_sharing.exceptions import SecretNotFound
 from django_secret_sharing.forms import CreateSecretForm
 from django_secret_sharing.utils import create_secret, get_secret_by_url_part
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
-from wagtail.core.models import Page
+from wagtail.models import Page
 
 
 class AbstractSecretsPage(RoutablePageMixin, Page):
